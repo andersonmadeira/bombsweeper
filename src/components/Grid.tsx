@@ -1,12 +1,49 @@
 import React from 'react'
 import styled from '@emotion/styled'
+
 import { Tile } from './Tile'
+import { GameStatus } from './types'
 
 const StyledGrid = styled.div<{ columns: number }>`
   display: grid;
-  width: max-content;
+  width: calc(${({ columns }) => columns} * 30px);
   grid-template-columns: repeat(${({ columns }) => columns}, 1fr);
   border: 0;
+`
+
+const GameContainer = styled.div<{ lines: number; columns: number }>`
+  position: relative;
+  width: calc(${({ columns }) => columns} * 30px);
+  height: calc(${({ lines }) => lines} * 30px);
+`
+
+const EndGameInfo = styled.div`
+  box-sizing: border-box;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  padding: 20px;
+  width: 180px;
+  height: 180px;
+  left: calc(50% - (180px / 2));
+  top: calc(50% - (180px / 2));
+`
+
+const EndGameEmoji = styled.span`
+  font-size: 80px;
+  margin-bottom: 10px;
+`
+
+const RestartButton = styled.button<{ gameStatus: GameStatus }>`
+  cursor: pointer;
+  padding: 6px 12px;
+  border: 0;
+  color: #fff;
+  background-color: ${({ gameStatus }) => (gameStatus === 'lost' ? 'tomato' : '#77c063')};
+  border-radius: 4px;
 `
 
 export interface GridProps {
@@ -42,20 +79,20 @@ const buildMineField = (lines: number, columns: number, mines: number): Record<s
 }
 
 export const Grid: React.FC<GridProps> = ({ lines, columns, mines }) => {
-  const [gameStep, setGameStep] = React.useState<'in_progress' | 'over'>('in_progress')
+  const [gameStatus, setGameStatus] = React.useState<GameStatus>('in_progress')
   const [minefield, setMinefield] = React.useState<Record<string, boolean>>({})
 
   React.useEffect(() => {
-    if (gameStep !== 'over') {
+    if (gameStatus === 'in_progress') {
       const field = buildMineField(lines, columns, mines)
       setMinefield(field)
     }
-  }, [lines, columns, mines, gameStep])
+  }, [lines, columns, mines, gameStatus])
 
-  const onGameOver = React.useCallback(() => setGameStep('over'), [])
+  const onGameOver = React.useCallback(() => setGameStatus('lost'), [])
 
   return (
-    <>
+    <GameContainer lines={lines} columns={columns}>
       <StyledGrid columns={columns}>
         {[...new Array(lines * columns)].map((_, i) => {
           const line = Math.floor(i / lines)
@@ -68,17 +105,23 @@ export const Grid: React.FC<GridProps> = ({ lines, columns, mines }) => {
               line={line}
               column={column}
               onGameOver={onGameOver}
-              step={gameStep}
+              gameStatus={gameStatus}
             />
           )
         })}
       </StyledGrid>
-      {gameStep === 'over' && (
-        <>
-          <span>Game Over!</span>
-          <button onClick={() => setGameStep('in_progress')}>Restart</button>
-        </>
+      {gameStatus !== 'in_progress' && (
+        <EndGameInfo>
+          <EndGameEmoji>☠️</EndGameEmoji>
+          <RestartButton gameStatus={gameStatus} onClick={() => setGameStatus('in_progress')}>
+            Restart
+          </RestartButton>
+        </EndGameInfo>
       )}
-    </>
+    </GameContainer>
   )
 }
+
+// bomb => 💣
+// win => 😎
+// loose => ☠️
