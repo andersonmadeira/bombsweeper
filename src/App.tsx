@@ -1,8 +1,14 @@
 import React from 'react'
+
 import { Grid } from './components'
+import { PageWrapper } from './styles'
 
 export const App: React.FC = () => {
-  return <Grid lines={10} columns={10} mines={5} />
+  return (
+    <PageWrapper>
+      <Grid lines={10} columns={10} mines={5} />
+    </PageWrapper>
+  )
 }
 
 // easy: 10, 10: 5

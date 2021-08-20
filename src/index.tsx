@@ -3,9 +3,11 @@ import ReactDOM from 'react-dom'
 
 import reportWebVitals from './reportWebVitals'
 import { App } from './App'
+import { GlobalStyles } from './styles'
 
 ReactDOM.render(
   <React.StrictMode>
+    <GlobalStyles />
     <App />
   </React.StrictMode>,
   document.getElementById('root'),
