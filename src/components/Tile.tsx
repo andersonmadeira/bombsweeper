@@ -47,10 +47,10 @@ export const Tile: React.FC<TileProps> = ({ line, column, value, handleReveal, i
 
   return (
     <StyledTile
+      role="button"
       type={type}
       isRevealed={isRevealed}
       onClick={() => handleReveal(line, column)}
-      aria-role="button"
     >
       <TileLabel isRevealed={isRevealed}>
         {type === 'bomb' ? '💣' : type === 'number' ? value : ''}
