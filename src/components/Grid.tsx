@@ -121,6 +121,12 @@ export const Grid: React.FC<GridProps> = ({ lines, columns, mines }) => {
     }
   }, [lines, columns, mines, gameStatus])
 
+  React.useEffect(() => {
+    if (Object.keys(revealedTiles).length + mines === lines * columns) {
+      setGameStatus(currentStatus => (currentStatus === 'in_progress' ? 'won' : currentStatus))
+    }
+  }, [revealedTiles, setGameStatus, lines, columns, mines])
+
   return (
     <GameContainer lines={lines} columns={columns}>
       <StyledGrid columns={columns}>
