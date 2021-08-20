@@ -18,19 +18,32 @@ const GameContainer = styled.div<{ lines: number; columns: number }>`
   height: calc(${({ lines }) => lines} * 30px);
 `
 
-const EndGameInfo = styled.div`
+const EndGameCard = styled.div`
   box-sizing: border-box;
   position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
   background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 4px;
+  border-radius: 10px;
   padding: 20px;
   width: 180px;
   height: 180px;
   left: calc(50% - (180px / 2));
   top: calc(50% - (180px / 2));
+  transform: perspective(750px) translate3d(0px, 0px, -250px) rotateX(27deg) scale(0.9, 0.9);
+  border: 5px solid #e6e6e6;
+  box-shadow: 0 70px 40px -20px rgba(0, 0, 0, 0.2);
+  transition: 0.4s ease-in-out transform;
+
+  &:hover {
+    transform: translate3d(0px, 0px, -250px);
+
+    & button {
+      opacity: 1;
+      transform: translate3d(0px, 0px, 0px);
+    }
+  }
 `
 
 const EndGameEmoji = styled.span`
@@ -45,6 +58,11 @@ const RestartButton = styled.button<{ gameStatus: GameStatus }>`
   color: #fff;
   background-color: ${({ gameStatus }) => (gameStatus === 'lost' ? 'tomato' : '#77c063')};
   border-radius: 4px;
+
+  opacity: 0;
+  transform: translate3d(0px, 50px, 0px);
+
+  transition: 0.4s ease-in-out transform, 0.2s ease-in-out opacity;
 `
 
 export interface GridProps {
@@ -124,12 +142,12 @@ export const Grid: React.FC<GridProps> = ({ lines, columns, mines }) => {
         })}
       </StyledGrid>
       {gameStatus !== 'in_progress' && (
-        <EndGameInfo>
+        <EndGameCard>
           <EndGameEmoji>{gameStatus === 'lost' ? '☠️' : '😎'}</EndGameEmoji>
           <RestartButton gameStatus={gameStatus} onClick={() => setGameStatus('in_progress')}>
             Restart
           </RestartButton>
-        </EndGameInfo>
+        </EndGameCard>
       )}
     </GameContainer>
   )
