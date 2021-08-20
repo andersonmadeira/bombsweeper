@@ -27,7 +27,7 @@ export const Tile: React.FC<TileProps> = ({ line, column, value, handleReveal, i
       role="button"
       type={type}
       isRevealed={isRevealed}
-      onClick={() => handleReveal(line, column)}
+      onClick={() => !isFlagged && handleReveal(line, column)}
       onContextMenu={e => {
         e.preventDefault()
         setIsFlagged(!isFlagged)
