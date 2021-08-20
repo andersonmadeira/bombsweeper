@@ -12,6 +12,14 @@ export interface TileProps {
 }
 
 export const Tile: React.FC<TileProps> = ({ line, column, value, handleReveal, isRevealed }) => {
+  const [isFlagged, setIsFlagged] = React.useState(false)
+
+  React.useEffect(() => {
+    if (isRevealed) {
+      setIsFlagged(false)
+    }
+  }, [isRevealed])
+
   const type = getTileType(value)
 
   return (
@@ -20,9 +28,13 @@ export const Tile: React.FC<TileProps> = ({ line, column, value, handleReveal, i
       type={type}
       isRevealed={isRevealed}
       onClick={() => handleReveal(line, column)}
+      onContextMenu={e => {
+        e.preventDefault()
+        setIsFlagged(!isFlagged)
+      }}
     >
-      <TileLabel isRevealed={isRevealed}>
-        {type === 'bomb' ? '💣' : type === 'number' ? value : ''}
+      <TileLabel isRevealed={isRevealed || isFlagged}>
+        {!isRevealed && isFlagged ? '🚩' : type === 'bomb' ? '💣' : type === 'number' ? value : ''}
       </TileLabel>
     </StyledTile>
   )
