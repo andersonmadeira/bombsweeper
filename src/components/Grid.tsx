@@ -16,6 +16,10 @@ const GameContainer = styled.div<{ lines: number; columns: number }>`
   position: relative;
   width: calc(${({ columns }) => columns} * 30px);
   height: calc(${({ lines }) => lines} * 30px);
+
+  &:hover .endgame-card {
+    opacity: 1;
+  }
 `
 
 const EndGameCard = styled.div`
@@ -34,7 +38,9 @@ const EndGameCard = styled.div`
   transform: perspective(750px) translate3d(0px, 0px, -250px) rotateX(27deg) scale(0.9, 0.9);
   border: 5px solid #e6e6e6;
   box-shadow: 0 70px 40px -20px rgba(0, 0, 0, 0.2);
-  transition: 0.4s ease-in-out transform;
+  transition: 0.4s ease-in-out transform, 0.3s ease-in-out opacity;
+
+  opacity: 0;
 
   &:hover {
     transform: translate3d(0px, 0px, -250px);
@@ -148,7 +154,7 @@ export const Grid: React.FC<GridProps> = ({ lines, columns, mines }) => {
         })}
       </StyledGrid>
       {gameStatus !== 'in_progress' && (
-        <EndGameCard>
+        <EndGameCard className="endgame-card">
           <EndGameEmoji>{gameStatus === 'lost' ? '☠️' : '😎'}</EndGameEmoji>
           <RestartButton gameStatus={gameStatus} onClick={() => setGameStatus('in_progress')}>
             Restart
