@@ -1,10 +1,8 @@
-import React from 'react'
 import styled from '@emotion/styled'
 
-import { TileType } from './types'
-import { getTileType } from './utils'
+import { TileType } from '../types'
 
-const StyledTile = styled.span<{ isRevealed: boolean; type: TileType }>`
+export const StyledTile = styled.span<{ isRevealed: boolean; type: TileType }>`
   cursor: pointer;
   user-select: none;
   display: flex;
@@ -26,35 +24,10 @@ const StyledTile = styled.span<{ isRevealed: boolean; type: TileType }>`
   transition: all 500ms ease-in-out;
 `
 
-const TileLabel = styled.span<{ isRevealed: boolean }>`
+export const TileLabel = styled.span<{ isRevealed: boolean }>`
   color: #345835;
   font-weight: 700;
   font-size: 18px;
   visibility: ${({ isRevealed }) => (isRevealed ? 'visible' : 'hidden')};
   opacity: ${({ isRevealed }) => (isRevealed ? 1 : 0)};
 `
-
-export interface TileProps {
-  line: number
-  column: number
-  value: number
-  handleReveal: (line: number, column: number) => void
-  isRevealed: boolean
-}
-
-export const Tile: React.FC<TileProps> = ({ line, column, value, handleReveal, isRevealed }) => {
-  const type = getTileType(value)
-
-  return (
-    <StyledTile
-      role="button"
-      type={type}
-      isRevealed={isRevealed}
-      onClick={() => handleReveal(line, column)}
-    >
-      <TileLabel isRevealed={isRevealed}>
-        {type === 'bomb' ? '💣' : type === 'number' ? value : ''}
-      </TileLabel>
-    </StyledTile>
-  )
-}
