@@ -3,6 +3,7 @@ import styled from '@emotion/styled'
 
 import { Tile } from './Tile'
 import { GameStatus } from './types'
+import { buildMineField, getTileCode, getTilesAround } from './utils'
 
 const StyledGrid = styled.div<{ columns: number }>`
   display: grid;
@@ -52,44 +53,55 @@ export interface GridProps {
   mines: number
 }
 
-const probability = (n: number): boolean => !!n && Math.random() <= n
-
-const buildMineField = (lines: number, columns: number, mines: number): Record<string, boolean> => {
-  const field: Record<string, boolean> = {}
-  let minesLeft = mines
-
-  for (let l = 0; l < lines; l++) {
-    for (let c = 0; c < columns; c++) {
-      const tileCode = `${l}-${c}`
-      const hasMine = probability(0.15)
-
-      field[tileCode] = hasMine
-
-      if (hasMine) {
-        minesLeft -= 1
-      }
-
-      if (minesLeft === 0) {
-        return field
-      }
-    }
-  }
-
-  return field
-}
-
 export const Grid: React.FC<GridProps> = ({ lines, columns, mines }) => {
   const [gameStatus, setGameStatus] = React.useState<GameStatus>('in_progress')
-  const [minefield, setMinefield] = React.useState<Record<string, boolean>>({})
+  const [minefield, setMinefield] = React.useState<Record<string, number>>({})
+  const [revealedTiles, setRevealedTiles] = React.useState<Record<string, boolean>>({})
+
+  const handleRevealTile = React.useCallback(
+    (line: number, column: number) => {
+      const tileCode = getTileCode(line, column)
+      const newRevealedTiles: Record<string, boolean> = {}
+      const toBeRevealed = [{ line, column }]
+
+      if (minefield[tileCode] === -1) {
+        setGameStatus('lost')
+      }
+
+      while (toBeRevealed.length > 0) {
+        const next = toBeRevealed.pop()
+
+        if (next) {
+          const tileCode = getTileCode(next.line, next.column)
+
+          newRevealedTiles[tileCode] = true
+
+          if (minefield[tileCode] > 0) {
+            continue
+          }
+
+          getTilesAround(next.line, next.column, lines, columns).forEach(pos => {
+            const code = getTileCode(pos.l, pos.c)
+
+            if (!revealedTiles[code] && !newRevealedTiles[code]) {
+              toBeRevealed.push({ line: pos.l, column: pos.c })
+            }
+          })
+        }
+      }
+
+      setRevealedTiles(revealed => ({ ...revealed, ...newRevealedTiles }))
+    },
+    [lines, columns, minefield, revealedTiles],
+  )
 
   React.useEffect(() => {
     if (gameStatus === 'in_progress') {
       const field = buildMineField(lines, columns, mines)
       setMinefield(field)
+      setRevealedTiles({})
     }
   }, [lines, columns, mines, gameStatus])
-
-  const onGameOver = React.useCallback(() => setGameStatus('lost'), [])
 
   return (
     <GameContainer lines={lines} columns={columns}>
@@ -97,22 +109,23 @@ export const Grid: React.FC<GridProps> = ({ lines, columns, mines }) => {
         {[...new Array(lines * columns)].map((_, i) => {
           const line = Math.floor(i / lines)
           const column = i % columns
-          const tileCode = `${line}-${column}`
+          const tileCode = getTileCode(line, column)
+
           return (
             <Tile
               key={tileCode}
-              field={minefield}
               line={line}
               column={column}
-              onGameOver={onGameOver}
-              gameStatus={gameStatus}
+              value={minefield[tileCode]}
+              handleReveal={handleRevealTile}
+              isRevealed={revealedTiles[tileCode] || gameStatus !== 'in_progress'}
             />
           )
         })}
       </StyledGrid>
       {gameStatus !== 'in_progress' && (
         <EndGameInfo>
-          <EndGameEmoji>☠️</EndGameEmoji>
+          <EndGameEmoji>{gameStatus === 'lost' ? '☠️' : '😎'}</EndGameEmoji>
           <RestartButton gameStatus={gameStatus} onClick={() => setGameStatus('in_progress')}>
             Restart
           </RestartButton>
@@ -121,7 +134,3 @@ export const Grid: React.FC<GridProps> = ({ lines, columns, mines }) => {
     </GameContainer>
   )
 }
-
-// bomb => 💣
-// win => 😎
-// loose => ☠️

@@ -1,9 +1,10 @@
 import React from 'react'
 import styled from '@emotion/styled'
 
-import { GameStatus } from './types'
+import { TileType } from './types'
+import { getTileType } from './utils'
 
-const StyledTile = styled.div<{ isRevealed: boolean; hasMine: boolean }>`
+const StyledTile = styled.span<{ isRevealed: boolean; type: TileType }>`
   cursor: pointer;
   user-select: none;
   display: flex;
@@ -11,81 +12,49 @@ const StyledTile = styled.div<{ isRevealed: boolean; hasMine: boolean }>`
   align-items: center;
   width: 26px;
   height: 26px;
-  // temporary, just for debugging purposes
-  background: ${({ isRevealed, hasMine }) => (hasMine && isRevealed ? 'tomato' : '#77C063')};
-  border: 2px solid #569358;
+  background: ${({ isRevealed, type }) =>
+    !isRevealed || type === 'number' ? '#77C063' : type === 'bomb' ? 'tomato' : '#8F6F4F'};
+  border: 2px solid
+    ${({ isRevealed, type }) =>
+      !isRevealed || type === 'number' ? '#569358' : type === 'bomb' ? 'tomato' : '#6C4D36'};
+
+  box-shadow: ${({ isRevealed, type }) =>
+    isRevealed && type === 'empty'
+      ? 'inset 2px 2px 8px #4f372e'
+      : '0px 3px 15px rgba(0, 0, 0, 0.4), inset 0px 1px 0px rgba(255, 255, 255, 0.3), inset 0px 0px 3px rgba(255, 255, 255, 0.5)'};
 
   transition: all 500ms ease-in-out;
 `
 
-const LabelNumber = styled.span`
+const TileLabel = styled.span<{ isRevealed: boolean }>`
   color: #345835;
   font-weight: 700;
   font-size: 18px;
-`
-
-const LabelMine = styled.span`
-  font-size: 15px;
+  visibility: ${({ isRevealed }) => (isRevealed ? 'visible' : 'hidden')};
+  opacity: ${({ isRevealed }) => (isRevealed ? 1 : 0)};
 `
 
 export interface TileProps {
   line: number
   column: number
-  field: Record<string, boolean>
-  onGameOver: () => void
-  gameStatus: GameStatus
+  value: number
+  handleReveal: (line: number, column: number) => void
+  isRevealed: boolean
 }
 
-const searchMines = (line: number, column: number, field: Record<string, boolean>): number => {
-  let count = 0
-
-  if (field[`${line}-${column}`]) {
-    return -1
-  }
-
-  for (let l = line - 1; l <= line + 1; l++) {
-    for (let c = column - 1; c <= column + 1; c++) {
-      if (field[`${l}-${c}`] && (l !== line || c !== column)) {
-        count += 1
-      }
-    }
-  }
-
-  return count
-}
-
-export const Tile: React.FC<TileProps> = ({ line, column, field, onGameOver, gameStatus }) => {
-  const [label, setLabel] = React.useState<JSX.Element>()
-
-  const code = `${line}-${column}`
-
-  const handleClickTile = React.useCallback(() => {
-    const mineCount = searchMines(line, column, field)
-    const tileLabel =
-      mineCount === -1 ? <LabelMine>💣</LabelMine> : <LabelNumber>{mineCount}</LabelNumber>
-
-    if (mineCount === -1) {
-      onGameOver()
-    }
-
-    setLabel(tileLabel)
-  }, [column, line, field, onGameOver])
-
-  React.useEffect(() => {
-    if (gameStatus === 'in_progress') {
-      setLabel(undefined)
-    } else {
-      handleClickTile()
-    }
-  }, [gameStatus, handleClickTile])
+export const Tile: React.FC<TileProps> = ({ line, column, value, handleReveal, isRevealed }) => {
+  const type = getTileType(value)
 
   return (
     <StyledTile
-      hasMine={field[code]}
-      isRevealed={gameStatus !== 'in_progress'}
-      onClick={() => gameStatus === 'in_progress' && handleClickTile()}
+      type={type}
+      isRevealed={isRevealed}
+      onClick={() => handleReveal(line, column)}
+      aria-role="button"
     >
-      {label}
+      <TileLabel isRevealed={isRevealed}>
+        {type === 'bomb' ? '💣' : type === 'number' ? value : ''}
+      </TileLabel>
     </StyledTile>
   )
 }
