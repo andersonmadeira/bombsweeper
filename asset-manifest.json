@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.js": "/bombsweeper/static/js/main.70a126dc.chunk.js",
-    "main.js.map": "/bombsweeper/static/js/main.70a126dc.chunk.js.map",
+    "main.js": "/bombsweeper/static/js/main.707732a7.chunk.js",
+    "main.js.map": "/bombsweeper/static/js/main.707732a7.chunk.js.map",
     "runtime-main.js": "/bombsweeper/static/js/runtime-main.4adc86d7.js",
     "runtime-main.js.map": "/bombsweeper/static/js/runtime-main.4adc86d7.js.map",
     "static/js/2.51f9bdc8.chunk.js": "/bombsweeper/static/js/2.51f9bdc8.chunk.js",
@@ -14,6 +14,6 @@
   "entrypoints": [
     "static/js/runtime-main.4adc86d7.js",
     "static/js/2.51f9bdc8.chunk.js",
-    "static/js/main.70a126dc.chunk.js"
+    "static/js/main.707732a7.chunk.js"
   ]
 }
