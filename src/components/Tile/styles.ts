@@ -1,8 +1,12 @@
 import styled from '@emotion/styled'
 
-import { TileType } from '../types'
+import { GameStatus, TileType } from '../types'
 
-export const StyledTile = styled.span<{ isRevealed: boolean; type: TileType }>`
+export const StyledTile = styled.span<{
+  isRevealed: boolean
+  gameStatus: GameStatus
+  type: TileType
+}>`
   cursor: pointer;
   user-select: none;
   display: flex;
@@ -10,11 +14,23 @@ export const StyledTile = styled.span<{ isRevealed: boolean; type: TileType }>`
   align-items: center;
   width: 26px;
   height: 26px;
-  background: ${({ isRevealed, type }) =>
-    !isRevealed || type === 'number' ? '#77C063' : type === 'bomb' ? 'tomato' : '#8F6F4F'};
+  background: ${({ isRevealed, type, gameStatus }) =>
+    !isRevealed || type === 'number'
+      ? '#77C063'
+      : type === 'empty'
+      ? '#8F6F4F'
+      : gameStatus === 'lost'
+      ? 'tomato'
+      : '#77C063'};
   border: 2px solid
-    ${({ isRevealed, type }) =>
-      !isRevealed || type === 'number' ? '#569358' : type === 'bomb' ? 'tomato' : '#6C4D36'};
+    ${({ isRevealed, type, gameStatus }) =>
+      !isRevealed || type === 'number'
+        ? '#569358'
+        : type === 'empty'
+        ? '#6C4D36'
+        : gameStatus === 'lost'
+        ? 'tomato'
+        : '#569358'};
 
   box-shadow: ${({ isRevealed, type }) =>
     isRevealed && type === 'empty'

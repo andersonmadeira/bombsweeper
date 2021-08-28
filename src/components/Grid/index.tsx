@@ -81,6 +81,7 @@ export const Grid: React.FC<GridProps> = ({ lines, columns, mines }) => {
               line={line}
               column={column}
               value={minefield[tileCode]}
+              gameStatus={gameStatus}
               handleReveal={handleRevealTile}
               isRevealed={revealedTiles[tileCode] || gameStatus !== 'in_progress'}
             />

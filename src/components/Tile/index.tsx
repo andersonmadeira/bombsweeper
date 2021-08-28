@@ -2,6 +2,7 @@ import React from 'react'
 
 import { StyledTile, TileLabel } from './styles'
 import { getTileType } from '../utils'
+import { GameStatus } from '../types'
 
 export interface TileProps {
   line: number
@@ -9,9 +10,17 @@ export interface TileProps {
   value: number
   handleReveal: (line: number, column: number) => void
   isRevealed: boolean
+  gameStatus: GameStatus
 }
 
-export const Tile: React.FC<TileProps> = ({ line, column, value, handleReveal, isRevealed }) => {
+export const Tile: React.FC<TileProps> = ({
+  line,
+  column,
+  value,
+  handleReveal,
+  isRevealed,
+  gameStatus,
+}) => {
   const [isFlagged, setIsFlagged] = React.useState(false)
 
   React.useEffect(() => {
@@ -27,6 +36,7 @@ export const Tile: React.FC<TileProps> = ({ line, column, value, handleReveal, i
       role="button"
       type={type}
       isRevealed={isRevealed}
+      gameStatus={gameStatus}
       onClick={() => !isFlagged && handleReveal(line, column)}
       onContextMenu={e => {
         e.preventDefault()
